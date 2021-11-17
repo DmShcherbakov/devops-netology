@@ -2,14 +2,10 @@
 
 ### 1. Какого типа команда cd? Попробуйте объяснить, почему она именно такого типа; опишите ход своих мыслей, если считаете что она могла бы быть другого типа.
 ```commandline
-$ type -t cp
-file
+vagrant@vagrant:~$ type -a cd
+cd is a shell builtin
 ```
-Данная команда имеет тип "файл", и вызывает программу, входящую в пакет coreutils:
-```commandline
-$ dpkg -S /bin/cp
-coreutils: /bin/cp
-```
+Данная команда является встроенной в shell. Она не имеет запускаемого файла, ее функционал описан в мануале bash в разделе "SHELL BUILTIN COMMANDS".
 
 ### 2. Какая альтернатива без pipe команде grep <some_string> <some_file> | wc -l? man grep поможет в ответе на этот вопрос. Ознакомьтесь с документом о других подобных некорректных вариантах использования pipe.
 Для вывода количества строк, содержащих совпадение, используется параметр "-c":
@@ -36,22 +32,19 @@ vagrant@vagrant:~$ cat /proc/1/cmdline
 Перенаправление, в общем виде, будет выглядеть как: `ls 2>/dev/pts/номер_терминала` (или /dev/ttyX, если мы говорим о TTY).
 
 ### 5. Получится ли одновременно передать команде файл на stdin и вывести ее stdout в другой файл? Приведите работающий пример.
-Да, получится. Например, при использовании команды `$ cat /var/log/syslog | grep CRON > ~/cron.log` содержимое файла /var/log/syslog, будет передано на stdin команды grep, а результат ее работы (stdout) будет направлен в файл cron.log, расположенный в домашнем каталоге текущего пользователя:
+Да, получится. Например, при использовании команды `$ wc -l < /etc/hosts > ~/hosts.cnt` содержимое файла /etc/hosts будет передано на stdin команды wc -l, а результат ее работы (stdout) будет направлен в файл hosts.cnt, расположенный в домашнем каталоге текущего пользователя:
 ```commandline
-vagrant@vagrant:~$ cat /var/log/syslog | grep CRON > ~/cron.log
-vagrant@vagrant:~$ cat ~/cron.log
-Nov 14 00:17:01 vagrant CRON[12755]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)
-Nov 14 01:17:02 vagrant CRON[12765]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)
-Nov 14 02:17:01 vagrant CRON[12792]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)
-Nov 14 03:10:01 vagrant CRON[12801]: (root) CMD (test -e /run/systemd/system || SERVICE_MODE=1 /sbin/e2scrub_all -A -r)
-Nov 14 03:17:01 vagrant CRON[12817]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)
-Nov 14 03:30:01 vagrant CRON[12823]: (root) CMD (test -e /run/systemd/system || SERVICE_MODE=1 /usr/lib/x86_64-linux-gnu/e2fsprogs/e2scrub_all_cron)
-Nov 14 04:17:01 vagrant CRON[12852]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)
-Nov 14 05:17:01 vagrant CRON[12864]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)
-Nov 14 06:17:01 vagrant CRON[12873]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)
-Nov 14 06:25:01 vagrant CRON[12878]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
-Nov 14 06:47:01 vagrant CRON[12943]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly ))
-Nov 14 07:17:01 vagrant CRON[12962]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)
+vagrant@vagrant:~$ wc -l < /etc/hosts > ~/hosts.cnt
+vagrant@vagrant:~$ cat ~/hosts.cnt 
+7
+vagrant@vagrant:~$ cat /etc/hosts
+127.0.0.1	localhost
+127.0.1.1	vagrant.vm	vagrant
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
 ```
 
 ### 6. Получится ли находясь в графическом режиме, вывести данные из PTY в какой-либо из эмуляторов TTY? Сможете ли вы наблюдать выводимые данные?
