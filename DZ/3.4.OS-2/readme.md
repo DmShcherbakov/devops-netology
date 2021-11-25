@@ -225,3 +225,80 @@ root@vagrant:/# lsns -l
 
 ### 7. Найдите информацию о том, что такое :(){ :|:& };:. Запустите эту команду в своей виртуальной машине Vagrant с Ubuntu 20.04 (это важно, поведение в других ОС не проверялось). Некоторое время все будет "плохо", после чего (минуты) – ОС должна стабилизироваться. Вызов dmesg расскажет, какой механизм помог автоматической стабилизации. Как настроен этот механизм по-умолчанию, и как изменить число процессов, которое можно создать в сессии?
 Данная команда известна как "логическая бомба" (fork bomb). Этот код Bash создаёт функцию, которая запускает ещё два своих экземпляра, которые, в свою очередь снова запускают эту функцию и так до тех пор, пока этот процесс не займёт всю физическую память компьютера, и он просто не зависнет.
+После запуска команды, сначала загрузка системы резко возрастает (можно наблюдать в top), а потом начинает снижаться.
+В журнале системы при этом можно увидеть следующее:
+```commandline
+vagrant@vagrant:~$ tail -1 /var/log/syslog 
+Nov 25 12:49:45 vagrant kernel: [ 6511.092801] cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-3.scope
+vagrant@vagrant:~$ dmesg | tail -1
+[ 6511.092801] cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-3.scope
+```
+В данном случае, сработал механизм CGROUPS (Control Groups). Посмотреть текущее содержимое групп контроля можно следующей командой:
+```commandline
+vagrant@vagrant:~$ systemd-cgls
+Control group /:
+-.slice
+├─user.slice 
+│ └─user-1000.slice 
+│   ├─session-9.scope 
+│   │ ├─ 1397 sshd: vagrant [priv]
+│   │ ├─ 1437 sshd: vagrant@pts/1
+│   │ ├─ 1438 -bash
+│   │ ├─33481 systemd-cgls
+│   │ └─33482 pager
+│   ├─user@1000.service 
+│   │ └─init.scope 
+│   │   ├─970 /lib/systemd/systemd --user
+│   │   └─971 (sd-pam)
+│   └─session-3.scope 
+│     ├─  957 sshd: vagrant [priv]
+│     ├─ 1004 sshd: vagrant@pts/0
+│     ├─ 1005 -bash
+│     ├─ 1254 bash
+│     ├─ 1446 SCREEN
+│     ├─ 1447 /bin/bash
+│     ├─33462 man systemd-cgls
+│     └─33472 pager
+├─init.scope 
+│ └─1 /sbin/init
+└─system.slice 
+  ├─irqbalance.service 
+...
+```
+Загрузку - командой systemd-cgtop.
+Также доступ к данным подсистемы можно получить, ознакомившись с содержимым файлов каталога `/sys/fs/cgroup/`. В нашем случае, в соответствии с информацией в журнале, интересовать будет следующий каталог:
+```commandline
+vagrant@vagrant:~$ ls /sys/fs/cgroup/pids/user.slice/user-1000.slice/session-3.scope/
+cgroup.clone_children  cgroup.procs  notify_on_release  pids.current  pids.events  pids.max  tasks
+```
+Если требуется информация по конкретному процессу, то:
+```commandline
+vagrant@vagrant:~$ cat /proc/1447/cgroup 
+12:perf_event:/
+11:memory:/user.slice/user-1000.slice/session-3.scope
+10:hugetlb:/
+9:freezer:/
+8:cpuset:/
+7:pids:/user.slice/user-1000.slice/session-3.scope
+6:devices:/user.slice
+5:cpu,cpuacct:/
+4:rdma:/
+3:blkio:/
+2:net_cls,net_prio:/
+1:name=systemd:/user.slice/user-1000.slice/session-3.scope
+0::/user.slice/user-1000.slice/session-3.scope
+vagrant@vagrant:~$ cd /sys/fs/ && find * -name "*.procs" -exec grep 1447 {} /dev/null \; 2> /dev/null
+cgroup/perf_event/cgroup.procs:1447
+cgroup/memory/user.slice/user-1000.slice/session-3.scope/cgroup.procs:1447
+cgroup/hugetlb/cgroup.procs:1447
+cgroup/freezer/cgroup.procs:1447
+cgroup/cpuset/cgroup.procs:1447
+cgroup/pids/user.slice/user-1000.slice/session-3.scope/cgroup.procs:1447
+cgroup/devices/user.slice/cgroup.procs:1447
+cgroup/cpu,cpuacct/cgroup.procs:1447
+cgroup/rdma/cgroup.procs:1447
+cgroup/blkio/cgroup.procs:1447
+cgroup/net_cls,net_prio/cgroup.procs:1447
+cgroup/systemd/user.slice/user-1000.slice/session-3.scope/cgroup.procs:1447
+cgroup/unified/user.slice/user-1000.slice/session-3.scope/cgroup.procs:1447
+```
