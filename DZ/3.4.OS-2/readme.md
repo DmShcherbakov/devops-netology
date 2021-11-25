@@ -43,32 +43,44 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 
+vagrant@vagrant:~$ cat /etc/node_exporter/node_exporter.conf 
+OPTIONS="
+--collector.cpu.info
+--collector.meminfo
+--collector.diskstats
+"
+vagrant@vagrant:~$ sudo systemctl daemon-reload 
 vagrant@vagrant:~$ sudo systemctl start node_exporter
-vagrant@vagrant:~$ sudo systemctl status node_exporter
+vagrant@vagrant:~$ systemctl status node_exporter
 ● node_exporter.service - Node Exporter Service
      Loaded: loaded (/lib/systemd/system/node_exporter.service; disabled; vendor preset: enabled)
-     Active: active (running) since Wed 2021-11-24 16:45:43 UTC; 4s ago
-   Main PID: 13205 (node_exporter)
+     Active: active (running) since Thu 2021-11-25 08:51:58 UTC; 5min ago
+   Main PID: 13600 (node_exporter)
       Tasks: 4 (limit: 1071)
-     Memory: 2.3M
+     Memory: 2.5M
      CGroup: /system.slice/node_exporter.service
-             └─13205 /usr/local/bin/node_exporter
+             └─13600 /usr/local/bin/node_exporter --collector.cpu.info --collector.meminfo --collector.diskstats
 
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:115 level=info collector=thermal_zone
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:115 level=info collector=time
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:115 level=info collector=timex
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:115 level=info collector=udp_queues
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:115 level=info collector=uname
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:115 level=info collector=vmstat
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:115 level=info collector=xfs
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:115 level=info collector=zfs
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.274Z caller=node_exporter.go:199 level=info msg="Listening on" address=:9100
-Nov 24 16:45:43 vagrant node_exporter[13205]: ts=2021-11-24T16:45:43.275Z caller=tls_config.go:195 level=info msg="TLS is disabled." http2=false
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:115 level=info collector=thermal_zone
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:115 level=info collector=time
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:115 level=info collector=timex
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:115 level=info collector=udp_queues
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:115 level=info collector=uname
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:115 level=info collector=vmstat
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:115 level=info collector=xfs
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:115 level=info collector=zfs
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.830Z caller=node_exporter.go:199 level=info msg="Listening on" address=:9100
+Nov 25 08:51:58 vagrant node_exporter[13600]: ts=2021-11-25T08:51:58.831Z caller=tls_config.go:195 level=info msg="TLS is disabled." http2=false
+
+vagrant@vagrant:~$ tr '\0' '\n' < /proc/13600/cmdline
+/usr/local/bin/node_exporter
+--collector.cpu.info
+--collector.meminfo
+--collector.diskstats
 vagrant@vagrant:~$ sudo systemctl enable node_exporter
 Created symlink /etc/systemd/system/multi-user.target.wants/node_exporter.service → /lib/systemd/system/node_exporter.service.
 vagrant@vagrant:~$ systemctl list-unit-files --state enabled | grep node_exporter
 node_exporter.service                  enabled enabled  
-
 ```
 Сервис запущен и добавлен в автозагрузку. Порт отвечает. С хост-системы можем видеть (порт 9123 перенаправляется на порт 9100 виртуальной системы - `  config.vm.network "forwarded_port", guest: 9100, host: 9123
 `):
