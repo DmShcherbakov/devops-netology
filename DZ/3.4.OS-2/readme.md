@@ -233,7 +233,19 @@ Nov 25 12:49:45 vagrant kernel: [ 6511.092801] cgroup: fork rejected by pids con
 vagrant@vagrant:~$ dmesg | tail -1
 [ 6511.092801] cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-3.scope
 ```
-В данном случае, сработал механизм CGROUPS (Control Groups). Посмотреть текущее содержимое групп контроля можно следующей командой:
+В данном случае, сработал механизм CGROUPS (Control Groups), контроллер pids:
+```commandline
+vagrant@vagrant:/boot$ grep CGROUP_PIDS /boot/config-`uname -r` 
+CONFIG_CGROUP_PIDS=y
+root@vagrant:~# man cgroups | grep -A 1 "pids (since"
+       pids (since Linux 4.3; CONFIG_CGROUP_PIDS)
+              This controller permits limiting the number of process that may be created in a cgroup (and its descendants).
+--
+       pids (since Linux 4.5)
+              This is the same as the version 1 pids controller.
+```
+
+Посмотреть текущее содержимое групп контроля можно следующей командой:
 ```commandline
 vagrant@vagrant:~$ systemd-cgls
 Control group /:
@@ -271,34 +283,20 @@ Control group /:
 vagrant@vagrant:~$ ls /sys/fs/cgroup/pids/user.slice/user-1000.slice/session-3.scope/
 cgroup.clone_children  cgroup.procs  notify_on_release  pids.current  pids.events  pids.max  tasks
 ```
-Если требуется информация по конкретному процессу, то:
+Значение по-умолчанию для допустимого количества процессов в данной ОС - 1071:
 ```commandline
-vagrant@vagrant:~$ cat /proc/1447/cgroup 
-12:perf_event:/
-11:memory:/user.slice/user-1000.slice/session-3.scope
-10:hugetlb:/
-9:freezer:/
-8:cpuset:/
-7:pids:/user.slice/user-1000.slice/session-3.scope
-6:devices:/user.slice
-5:cpu,cpuacct:/
-4:rdma:/
-3:blkio:/
-2:net_cls,net_prio:/
-1:name=systemd:/user.slice/user-1000.slice/session-3.scope
-0::/user.slice/user-1000.slice/session-3.scope
-vagrant@vagrant:~$ cd /sys/fs/ && find * -name "*.procs" -exec grep 1447 {} /dev/null \; 2> /dev/null
-cgroup/perf_event/cgroup.procs:1447
-cgroup/memory/user.slice/user-1000.slice/session-3.scope/cgroup.procs:1447
-cgroup/hugetlb/cgroup.procs:1447
-cgroup/freezer/cgroup.procs:1447
-cgroup/cpuset/cgroup.procs:1447
-cgroup/pids/user.slice/user-1000.slice/session-3.scope/cgroup.procs:1447
-cgroup/devices/user.slice/cgroup.procs:1447
-cgroup/cpu,cpuacct/cgroup.procs:1447
-cgroup/rdma/cgroup.procs:1447
-cgroup/blkio/cgroup.procs:1447
-cgroup/net_cls,net_prio/cgroup.procs:1447
-cgroup/systemd/user.slice/user-1000.slice/session-3.scope/cgroup.procs:1447
-cgroup/unified/user.slice/user-1000.slice/session-3.scope/cgroup.procs:1447
+root@vagrant:~# find /sys/fs/cgroup/ -name pids.max -exec cat {} \; | sort | uniq 
+1071
+max
+```
+Изменить параметры для данного ограничения можно в файлах pids.max, расположенных в соответствующих каталогах, в зависимости от того, в каком масштабе требуется применить новые ограничения:
+```commandline
+root@vagrant:~# find /sys/fs/cgroup/ -name pids.max 
+/sys/fs/cgroup/pids/user.slice/user-1000.slice/session-9.scope/pids.max
+/sys/fs/cgroup/pids/user.slice/user-1000.slice/user@1000.service/pids.max
+/sys/fs/cgroup/pids/user.slice/user-1000.slice/session-3.scope/pids.max
+/sys/fs/cgroup/pids/user.slice/user-1000.slice/pids.max
+/sys/fs/cgroup/pids/user.slice/pids.max
+/sys/fs/cgroup/pids/system.slice/irqbalance.service/pids.max
+...
 ```
