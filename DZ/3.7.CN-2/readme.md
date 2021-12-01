@@ -211,7 +211,7 @@ root@dm:/etc/NetworkManager/system-connections# nmcli conn up Vlan1000
 Соединение успешно активировано (адрес действующего D-Bus: /org/freedesktop/NetworkManager/ActiveConnection/6)
 root@dm:/etc/NetworkManager/system-connections# ip -br a s
 lo               UNKNOWN        127.0.0.1/8 ::1/128 
-enp4s0           UP             10.12.26.30/24 fe80::1f6c:9cbf:e1b4:98a8/64 
+enp4s0           UP             10.12.26.123/24 fe80::1f6c:9cbf:e1b4:98a8/64 
 ...
 Vlan1000@enp4s0    UP             192.168.123.123/24 fe80::2bbd:837c:c5c0:d05e/64 
 ```
@@ -418,9 +418,9 @@ Hosts/Net: 6                     Class A, Private Internet
 ### 7. Как проверить ARP таблицу в Linux, Windows? Как очистить ARP кеш полностью? Как из ARP таблицы удалить только один нужный IP?
 Действие|В ОС Linux: | В ОС Windows:
 ---|---|---
-- посмотреть ARP-таблицу: | `arp` | `arp -a`
-- очистить ARP кеш полностью: | `sudo ip -s -s neigh flush all` | `netsh interface ip delete arpcache` или `arp -d *` с правами администратора
-- удалить только один нужный IP: | `sudo arp -d address` |  `arp -d address` с правами администратора
+посмотреть ARP-таблицу: | `arp` | `arp -a`
+очистить ARP кеш полностью: | `sudo ip -s -s neigh flush all` | `netsh interface ip delete arpcache` или `arp -d *` с правами администратора
+удалить только один нужный IP: | `sudo arp -d address` |  `arp -d address` с правами администратора
 
 Пример работы в Linux:
 ```commandline
