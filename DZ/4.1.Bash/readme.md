@@ -7,7 +7,7 @@ c=a+b
 d=$a+$b
 e=$(($a+$b))
 ```
-###Какие значения переменным c,d,e будут присвоены? Почему?
+### Какие значения переменным c,d,e будут присвоены? Почему?
 | Переменная	 |Значение	|Обоснование|
 |-------------|---|---|
 | `c`         |`a+b`|Без указания символа `$` a и b воспринимаются просто как символы, соответственно переменной `c` присваивается текстовая строка `a+b`|
@@ -33,10 +33,10 @@ do
 	curl https://localhost:4757
 	if (($? != 0))
 	then
-		date >> curl.log
-    sleep 1
+            date >> curl.log
+            sleep 1
 	else
-	  break
+	    break
 	fi
 done
 ```
@@ -48,15 +48,15 @@ ip1=192.168.0.1
 ip2=173.194.222.113
 ip3=87.250.250.242
 for i in {1..5}
-  do
-    echo ------ $(date) ------ >> test.log
-    for j in {$ip1,$ip2,$ip3}
-      do
-        echo "******** $j ********" >> test.log
-        nmap -p 80 $j >> test.log
-      done
-    echo ===================== >> test.log
-  done
+do
+  echo ------ $(date) ------ >> test.log
+  for j in {$ip1,$ip2,$ip3}
+    do
+      echo "******** $j ********" >> test.log
+      nmap -p 80 $j >> test.log
+    done
+  echo ===================== >> test.log
+done
 exit 0
 ```
 
