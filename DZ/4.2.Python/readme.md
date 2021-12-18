@@ -56,7 +56,6 @@ def res_prep_print(res_find, lng):
     print(f"{dir_path}/{prepare_result}")
 
 for result in result_os.split('\n'):
-#    if result.find('изменено') != -1:
     if result.find('modified') != -1:
         res_prep_print(result, 'en')
     elif result.find('изменено') != -1:
@@ -77,12 +76,47 @@ for result in result_os.split('\n'):
 
 ### Ваш скрипт:
 ```python
-???
+#!/usr/bin/env python3
+
+import os
+import sys
+
+def res_prep_print(res_find, lng, dir_pa):
+    if lng == 'en':
+        prepare_result = res_find.replace('\tmodified:   ', '')
+    elif lng == 'ru':
+        prepare_result = res_find.replace('\tизменено:   ', '')
+    prepare_result = prepare_result.strip()
+    print(f"{dir_pa}/{prepare_result}")
+
+def git_rep_check(dirp):
+    bash_command = [f"cd {dirp}", "git status"]
+    result_os = os.popen(' && '.join(bash_command)).read()
+    for result in result_os.split('\n'):
+    #    if result.find('изменено') != -1:
+        if result.find('modified') != -1:
+            res_prep_print(result, 'en', dirp)
+        elif result.find('изменено') != -1:
+            res_prep_print(result, 'ru', dirp)
+
+for arg_dir in sys.argv [1:]:
+    if not os.access(arg_dir, os.F_OK):
+        print(arg_dir,'doesn\'t exists')
+    else:
+        if not os.access(f'{arg_dir}/.git/config', os.F_OK):
+            print(arg_dir,'is not a git repository')
+        else:
+            git_rep_check(arg_dir)
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+$ ./test2.py /root/ /123/1 ~/devops-netology
+/root/ is not a git repository
+/123/1 doesn't exists
+/home/dimka/devops-netology/DZ/4.2.Python/readme.md
+/home/dimka/devops-netology/test/test.py
+/home/dimka/devops-netology/test/test2.py
 ```
 
 ## Обязательная задача 4
