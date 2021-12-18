@@ -22,3 +22,4 @@ for result in result_os.split('\n'):
         res_prep_print(result, 'en')
     elif result.find('изменено') != -1:
         res_prep_print(result, 'ru')
+test
