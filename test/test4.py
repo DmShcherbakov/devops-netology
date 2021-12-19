@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 
 import dns.resolver
+import json
+import yaml
 
-prev_check_file = './prev.chck'
+prev_check_json = './prev.json'
+prev_check_yaml = './prev.yml'
 addr_dict_old = {}
 addr_dict_new = {}
 addr_list = ['drive.google.com', 'mail.google.com', 'google.com']
 
-with open(prev_check_file, 'r') as fread:
-    for rstr in fread:
-        key, value = rstr.split(': ')
-        value = value.replace('\n','')
-#        addr_dict_old.update({key:value})
-        addr_dict_old[key] = value
-
-with open(prev_check_file, 'w') as f:
+with open(prev_check_json, 'r') as fread:
+    addr_dict_old = json.load(fread)
+with open(prev_check_json, 'w') as f:
     f.close
 
 for addr in addr_list:
@@ -23,10 +21,12 @@ for addr in addr_list:
     print(addr, '-', ip_a)
     addr_dict_new[f'{addr}'] = ip_a
 
-with open(prev_check_file, 'a') as f:
-        for key, value in  addr_dict_new.items():
-            f.write(f'{key}: {value}\n')
+with open(prev_check_json, 'a') as f:
+    f.write(json.dumps(addr_dict_new))
 
-for  key, value in addr_dict_new.items():
+with open(prev_check_yaml, 'a') as f:
+    f.write(yaml.dump(addr_dict_new))
+
+for key, value in addr_dict_new.items():
     if addr_dict_new.get(key) != addr_dict_old.get(key):
         print(f'[ERROR] {key} IP mismatch: {addr_dict_old.get(key)} {addr_dict_new.get(key)}')
