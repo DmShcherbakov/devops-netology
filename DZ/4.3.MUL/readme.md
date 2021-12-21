@@ -111,13 +111,14 @@ google.com - 74.125.131.102
 ```
 
 ### json-файл(ы), который(е) записал ваш скрипт:
+fprev.json
 ```json
-$ cat fprev.json 
 { "drive.google.com" : "173.194.221.194"}
 { "mail.google.com" : "142.251.1.17"}
 { "google.com" : "74.125.131.102"}
-$
-$ cat prev.json 
+```
+prev.json 
+```json
 {
     "drive.google.com": "173.194.221.194",
     "mail.google.com": "142.251.1.17",
@@ -126,13 +127,14 @@ $ cat prev.json
 ```
 
 ### yml-файл(ы), который(е) записал ваш скрипт:
+fprev.yml
 ```yaml
-$ cat fprev.yml 
 - drive.google.com: 173.194.221.194
 - mail.google.com: 142.251.1.17
 - google.com: 74.125.131.102
-$
-$ cat prev.yml 
+```
+prev.yml
+```yaml
 ---
 drive.google.com: 173.194.221.194
 google.com: 74.125.131.102
