@@ -1,7 +1,7 @@
 # Курсовая работа по итогам модуля "DevOps и системное администрирование" - Дмитрий Щербаков
 ### 1. Создайте виртуальную машину Linux.
 ```commandline
-$ cat ~/vagrant_curs/Vagrantfile | grep -v '^[ ]*#' | grep -v '^$'
+$ cat ~/vagrant_curs/Vagrantfile | grep -vE '^( *#|$)'
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/ubuntu-20.04"
 config.vm.network "public_network", type: "dhcp", :bridge => 'enp7s0'
@@ -75,9 +75,9 @@ root@vagrant:~/vault# vault write -format=json pki_int/intermediate/generate/int
 root@vagrant:~/vault# vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr format=pem_bundle ttl="43800h" | jq -r '.data.certificate' > intermediate.cert.pem
 root@vagrant:~/vault# vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
 Success! Data written to: pki_int/intermediate/set-signed
-root@vagrant:~/vault# vault write pki_int/roles/netology-dot-test allowed_domains="netology.test" allow_subdomains=true max_ttl="720h"
+root@vagrant:~/vault# vault write pki_int/roles/netology-dot-test allowed_domains="netology.test" allow_subdomains=true max_ttl="745h"
 Success! Data written to: pki_int/roles/netology-dot-test
-root@vagrant:~/vault# vault write pki_int/issue/netology-dot-test common_name="test.netology.test" ttl="720h"
+root@vagrant:~/vault# vault write pki_int/issue/netology-dot-test common_name="test.netology.test" ttl="745h"
 Key                 Value
 ---                 -----
 ca_chain            [-----BEGIN CERTIFICATE-----
@@ -123,7 +123,7 @@ ii  nginx-core                           1.18.0-0ubuntu1.2                 amd64
 ### - можно использовать стандартную стартовую страницу nginx для демонстрации работы сервера;
 ### - можно использовать и другой html файл, сделанный вами;
 ```commandline
-root@vagrant:~/vault# cat /etc/nginx/sites-enabled/default | grep -v '#'| grep -v '^$'
+root@vagrant:~# cat /etc/nginx/sites-enabled/default | grep -vE '(#|^$)'
 server {
 	listen 443 ssl default_server;
 	ssl_certificate		/etc/nginx/certs/test.netology.test.pem;
@@ -152,7 +152,7 @@ cd /root/scripts/tmp/
 vault write -format=json pki_int/issue/netology-dot-test \
     common_name="test.netology.test" \
     alt_names="test.netology.test" \
-    ttl="720h" > test.netology.test.crt
+    ttl="745h" > test.netology.test.crt
 
 cat test.netology.test.crt | jq -r .data.certificate > test.netology.test.crt.pem
 cat test.netology.test.crt | jq -r .data.issuing_ca >> test.netology.test.crt.pem
@@ -166,15 +166,20 @@ systemctl restart nginx
 
 ### 10. Поместите скрипт в crontab, чтобы сертификат обновлялся какого-то числа каждого месяца в удобное для вас время.
 ```commandline
-root@vagrant:/etc# cat /etc/crontab | grep cert_update
-55 21	28 * *	root	/root/scripts/cert_update.sh
-root@vagrant:/etc# date
-Tue Dec 28 21:55:15 MSK 2021
-root@vagrant:/etc# tail -100 /var/log/syslog | grep cert_update
-Dec 28 21:55:01 vagrant CRON[2136]: (root) CMD (/root/scripts/cert_update.sh)
-root@vagrant:/etc# ls -l /etc/nginx/certs/
+root@vagrant:~# cat /etc/crontab | grep cert_update
+40 8	29 * *	root	/root/scripts/cert_update.sh
+root@vagrant:~# date
+Wed Dec 29 08:40:44 MSK 2021
+root@vagrant:~# tail -100 /var/log/syslog | grep -A 5 cert_update
+Dec 29 08:40:01 vagrant CRON[3005]: (root) CMD (/root/scripts/cert_update.sh)
+Dec 29 08:40:01 vagrant systemd[1]: Stopping A high performance web server and a reverse proxy server...
+Dec 29 08:40:01 vagrant systemd[1]: nginx.service: Succeeded.
+Dec 29 08:40:01 vagrant systemd[1]: Stopped A high performance web server and a reverse proxy server.
+Dec 29 08:40:01 vagrant systemd[1]: Starting A high performance web server and a reverse proxy server...
+Dec 29 08:40:01 vagrant systemd[1]: Started A high performance web server and a reverse proxy server.
+root@vagrant:~# ls -l /etc/nginx/certs/
 total 40
--rw-r--r-- 1 root root 1675 Dec 28 21:55 test.netology.test.key
--rw-r--r-- 1 root root 2579 Dec 28 21:55 test.netology.test.pem
+-rw-r--r-- 1 root root 1675 Dec 29 08:40 test.netology.test.key
+-rw-r--r-- 1 root root 2579 Dec 29 08:40 test.netology.test.pem
 ```
 ![](./site_after_update.png)
