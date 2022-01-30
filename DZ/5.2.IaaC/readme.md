@@ -35,7 +35,7 @@ ansible 2.9.6
 ## Задача 4
 ## Воспроизвести практическую часть лекции самостоятельно.
 ## - Создать виртуальную машину.
-## - Зайти внутрь ВМ, убедиться, что Docker установлен с помощью команды
+## - Зайти внутрь ВМ, убедиться, что Docker установлен с помощью команды `docker ps`
 ```commandline
 dim@dm:~/Netology/vag/vagrant$ vagrant up
 Bringing machine 'server1.netology' up with 'virtualbox' provider...
