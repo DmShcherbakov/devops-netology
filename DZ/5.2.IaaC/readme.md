@@ -31,3 +31,31 @@ ansible 2.9.6
   executable location = /usr/bin/ansible
   python version = 3.8.10 (default, Nov 26 2021, 20:14:08) [GCC 9.3.0]
 ```
+
+## Задача 4
+## Воспроизвести практическую часть лекции самостоятельно.
+## - Создать виртуальную машину.
+## - Зайти внутрь ВМ, убедиться, что Docker установлен с помощью команды
+```commandline
+dim@dm:~/Netology/vag/vagrant$ vagrant up
+Bringing machine 'server1.netology' up with 'virtualbox' provider...
+...
+PLAY RECAP *********************************************************************
+server1.netology           : ok=7    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+dim@dm:~/Netology/vag/vagrant$ vagrant ssh
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-91-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+ System information disabled due to load higher than 1.0
+
+
+This system is built by the Bento project by Chef Software
+More information can be found at https://github.com/chef/bento
+Last login: Sun Jan 30 14:52:32 2022 from 10.0.2.2
+vagrant@server1:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
