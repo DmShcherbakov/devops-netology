@@ -73,7 +73,7 @@ The push refers to repository [docker.io/dmshch/netology]
 7d0ebbe3f5d2: Pushed 
 nginx-v1: digest: sha256:f1ae8e011c6509a6ebd91fb2fbeb7136168c9070b66dbe648f108fe279e7f989 size: 1777
 ```
-<code>[Ссылка на репозиторий](https://hub.docker.com/r/dmshch/netology)
+[Ссылка на репозиторий](https://hub.docker.com/r/dmshch/netology)
 
 ## Задача 2
 
@@ -172,5 +172,5 @@ a2fe0cf657ae: Pushed
 1a058d5342cc: Mounted from library/alpine 
 2.9.24: digest: sha256:0538f1fedba95b9b3ca9f9c8f0ec484c6696d1b6e488c422074b61efaa3472da size: 947
 ```
-<code>[Ссылка на репозиторий](https://hub.docker.com/r/dmshch/ansible)
+[Ссылка на репозиторий](https://hub.docker.com/r/dmshch/ansible)
 
