@@ -26,3 +26,5 @@ $ yc compute image list
 
 
 ![](vm_image.png)
+
+![](grafana.png)
