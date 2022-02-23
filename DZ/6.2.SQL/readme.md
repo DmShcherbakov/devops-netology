@@ -344,10 +344,6 @@ postgres=# \l
            |          |          |            |            | postgres=CTc/postgres
 (3 rows)
 
-postgres=# CREATE DATABASES test_db;
-ERROR:  syntax error at or near "DATABASES"
-LINE 1: CREATE DATABASES test_db;
-               ^
 postgres=# CREATE DATABASE test_db;
 CREATE DATABASE
 postgres=# CREATE USER "test-admin-user";
