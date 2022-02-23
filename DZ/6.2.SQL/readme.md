@@ -106,7 +106,34 @@ Foreign-key constraints:
     "clients_заказ_fkey" FOREIGN KEY ("заказ") REFERENCES orders(id)
 ```
 ### - SQL-запрос для выдачи списка пользователей с правами над таблицами test_db
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Вариант вывода одной командой:
+```commandline
+test_db=# select table_privs(usename) from pg_user;
+                                      table_privs                                      
+---------------------------------------------------------------------------------------
+ (postgres,orders,"{SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER}")
+ (postgres,clients,"{SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER}")
+ (test-admin-user,orders,"{SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER}")
+ (test-admin-user,clients,"{SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER}")
+ (test-simple-user,orders,"{SELECT,INSERT,UPDATE,DELETE}")
+ (test-simple-user,clients,"{SELECT,INSERT,UPDATE,DELETE}")
+(6 rows)
+```
+Более наглядный вариант отдельно по пользователям:
+```commandline
+test_db=# SELECT * FROM table_privs('test-admin-user');
+    username     | relname |                           privs                           
+-----------------+---------+-----------------------------------------------------------
+ test-admin-user | orders  | {SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER}
+ test-admin-user | clients | {SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER}
+(2 rows)
+
+test_db=# SELECT * FROM table_privs('test-simple-user');
+     username     | relname |             privs             
+------------------+---------+-------------------------------
+ test-simple-user | orders  | {SELECT,INSERT,UPDATE,DELETE}
+ test-simple-user | clients | {SELECT,INSERT,UPDATE,DELETE}
+```
 
 ### - список пользователей с правами над таблицами test_db
 ```commandline
