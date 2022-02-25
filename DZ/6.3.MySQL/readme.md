@@ -145,10 +145,125 @@ mysql> select * from INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER='test';
 
 ### Установите профилирование `SET profiling = 1`.
 ### Изучите вывод профилирования команд `SHOW PROFILES;`.
+```commandline
+mysql> SET profiling=1;
+Query OK, 0 rows affected, 1 warning (0.01 sec)
 
+mysql> SELECT * FROM orders;
++----+-----------------------+-------+
+| id | title                 | price |
++----+-----------------------+-------+
+|  1 | War and Peace         |   100 |
+|  2 | My little pony        |   500 |
+|  3 | Adventure mysql times |   300 |
+|  4 | Server gravity falls  |   300 |
+|  5 | Log gossips           |   123 |
++----+-----------------------+-------+
+5 rows in set (0.00 sec)
+
+mysql> SHOW PROFILES;
++----------+------------+----------------------+
+| Query_ID | Duration   | Query                |
++----------+------------+----------------------+
+|        1 | 0.00041525 | SELECT * FROM orders |
++----------+------------+----------------------+
+1 row in set, 1 warning (0.00 sec)
+
+mysql> SHOW PROFILE FOR QUERY 1;
++--------------------------------+----------+
+| Status                         | Duration |
++--------------------------------+----------+
+| starting                       | 0.000104 |
+| Executing hook on transaction  | 0.000009 |
+| starting                       | 0.000013 |
+| checking permissions           | 0.000009 |
+| Opening tables                 | 0.000047 |
+| init                           | 0.000009 |
+| System lock                    | 0.000017 |
+| optimizing                     | 0.000009 |
+| statistics                     | 0.000022 |
+| preparing                      | 0.000025 |
+| executing                      | 0.000065 |
+| end                            | 0.000007 |
+| query end                      | 0.000006 |
+| waiting for handler commit     | 0.000013 |
+| closing tables                 | 0.000012 |
+| freeing items                  | 0.000023 |
+| cleaning up                    | 0.000025 |
++--------------------------------+----------+
+17 rows in set, 1 warning (0.00 sec)
+```
 ### Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.
-
+```commandline
+mysql> SHOW CREATE TABLE orders;
++--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table  | Create Table                                                                                                                                                                                                                              |
++--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| orders | CREATE TABLE `orders` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(80) NOT NULL,
+  `price` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+```
+Здесь видно, что используется "движок" InnoDB.
 ### Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:
 ### - на `MyISAM`
 ### - на `InnoDB`
+```commandline
+mysql> ALTER TABLE orders ENGINE = MyISAM;
+Query OK, 5 rows affected (0.37 sec)
+Records: 5  Duplicates: 0  Warnings: 0
 
+mysql> ALTER TABLE orders ENGINE = InnoDB;
+Query OK, 5 rows affected (0.39 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> SHOW PROFILES;
++----------+------------+------------------------------------+
+| Query_ID | Duration   | Query                              |
++----------+------------+------------------------------------+
+...
+|        7 | 0.36196625 | ALTER TABLE orders ENGINE = MyISAM |
+|        8 | 0.39431500 | ALTER TABLE orders ENGINE = InnoDB |
++----------+------------+------------------------------------+
+8 rows in set, 1 warning (0.00 sec)
+```
+
+## Задача 4
+
+### Изучите файл `my.cnf` в директории /etc/mysql.
+### Измените его согласно ТЗ (движок InnoDB):
+### - Скорость IO важнее сохранности данных
+### - Нужна компрессия таблиц для экономии места на диске
+### - Размер буффера с незакомиченными транзакциями 1 Мб
+### - Буффер кеширования 30% от ОЗУ
+### - Размер файла логов операций 100 Мб
+
+Приведите в ответе измененный файл `my.cnf`.
+```commandline
+dimka@dmhome:~/Docker/MySQL/conf$ head -1 /proc/meminfo 
+MemTotal:       16362748 kB
+dimka@dmhome:~/Docker/MySQL/conf$ cat my.cnf 
+[mysqld]
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+datadir         = /var/lib/mysql
+secure-file-priv= NULL
+# For DZ
+# Скорость IO важнее сохранности данных
+innodb_flush_log_at_trx_commit = 2
+# Нужна компрессия таблиц для экономии места на диске
+innodb_file_format=Barracuda
+# Размер буффера с незакомиченными транзакциями 1 Мб
+innodb_log_buffer_size = 1M
+# Буффер кеширования 30% от ОЗУ
+innodb_buffer_pool_size = 5333M
+#Размер файла логов операций 100 Мб
+innodb_log_file_size = 100M
+
+# Custom config should go here
+!includedir /etc/mysql/conf.d/
+```
