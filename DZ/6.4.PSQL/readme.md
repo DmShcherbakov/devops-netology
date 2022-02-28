@@ -224,3 +224,4 @@ root@dmhome:/home/dimka/PSQL# diff test_db.dump test_db.dump_bck
 >     title character varying(80) NOT NULL,
 ```
 [Откорректированный файл бэкапа](test_db.dump)
+
