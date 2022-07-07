@@ -11,14 +11,14 @@ origin	git@github.com:DmShcherbakov/ansible-8.2 (push)
 ```
 ### 3. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
 ```commandline
-10:41:22 dim@dm:~/Nextcloud2/Обмен/ans8.2/ansible-8.2$ git commit
+$ git commit
 [main 8c91b44] Playbook added
  4 files changed, 6118 insertions(+)
  create mode 100644 playbook/.gitignore
  create mode 100644 playbook/group_vars/clickhouse/vars.yml
  create mode 100644 playbook/inventory/prod.yml
  create mode 100644 playbook/site.yml
-10:41:38 dim@dm:~/Nextcloud2/Обмен/ans8.2/ansible-8.2$ git push
+$ git push
 Перечисление объектов: 11, готово.
 Подсчет объектов: 100% (11/11), готово.
 При сжатии изменений используется до 4 потоков
