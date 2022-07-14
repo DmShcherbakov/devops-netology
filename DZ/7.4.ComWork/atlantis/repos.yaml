@@ -1,0 +1,17 @@
+repos:
+- id: github.com/DmShcherbakov/terraform-7.2
+  apply_requirements: [mergeable]
+  allow_custom_workflows: true
+  allowed_overrides: [workflow, apply_requirements]
+
+workflows:
+  default:
+    plan:
+      steps:
+      - init
+      - plan:
+          extra_args: ["-lock=false"]
+    apply:
+      steps:
+      - run: echo hi
+      - apply

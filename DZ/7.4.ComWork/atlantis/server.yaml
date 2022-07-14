@@ -1,0 +1,5 @@
+---
+gh-user: DmShcherbakov
+gh-token: ____________
+repo-allowlist: 'github.com/DmShcherbakov/*'
+gh-webhook-secret: __________

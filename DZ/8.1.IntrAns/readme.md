@@ -55,7 +55,7 @@ ok: [localhost] => {
 }
 ...
 ```
-2. Найдите файл с переменными (group_vars) в котором задаётся найденное в первом пункте значение и поменяйте его на 'all default fact'.
+### 2. Найдите файл с переменными (group_vars) в котором задаётся найденное в первом пункте значение и поменяйте его на 'all default fact'.
 ```commandline
 $ sed -i 's/12/all default fact/g' `grep -rl 12 *`
 $ ansible-playbook -i inventory/test.yml site.yml 
