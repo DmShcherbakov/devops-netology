@@ -184,7 +184,7 @@ while (index < 10):
     index = increment(index)
     print(get_square(index))
 ```
-Warnings предписывают конкретнее указать для какой версии Python осуществляется проверка (для уточнения, используется параметр `sonar.python.version`), а также осуществляет проверку комментариев об авторстве и коммите (для ее отключение используется параметр `sonar.scm.disabled=true`).
+Warnings предписывают конкретнее указать для какой версии Python осуществляется проверка (для уточнения, используется параметр `sonar.python.version`), а также осуществляется проверка комментариев об авторстве и коммите (для ее отключения используется параметр `sonar.scm.disabled=true`).
 ### 8. Запускаем анализатор повторно - проверяем, что QG пройдены успешно
 ```commandline
 $ sonar-scanner -Dsonar.coverage.exclusions=fail.py -Dsonar.login=2c02dc4d15416a39450ae6c8a61ba54b147b3f83 -Dsonar.projectKey=dmshch-netology -Dsonar.python.version=3 -Dsonar.scm.disabled=true
